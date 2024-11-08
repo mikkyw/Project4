@@ -26,7 +26,7 @@ def question2():
 
 def question3a():
     answerDiscount = 0.3
-    answerNoise = 0.2
+    answerNoise = 0
     answerLivingReward = -1
     return answerDiscount, answerNoise, answerLivingReward
     # If not possible, return 'NOT POSSIBLE'
