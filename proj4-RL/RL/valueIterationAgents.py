@@ -60,20 +60,18 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.runValueIteration()
 
     def runValueIteration(self):
-        # Write value iteration code here
-        #max sum tra
         for i in range(self.iterations):
             newVals = util.Counter()
             for state in self.mdp.getStates():
                 if self.mdp.isTerminal(state):
                     newVals[state] = 0
                 else:
-                    actionVals = [self.computeQValueFromValues(state, action)
-                                   for action in self.mdp.getPossibleActions(state)]
-                    if actionVals:
-                        newVals[state] = max(actionVals)
+                    actions = []
+                    for action in self.mdp.getPossibleActions(state):
+                        actions.append(self.computeQValueFromValues(state, action))
+                    if actions:
+                        newVals[state] = max(actions) #we need to get the best action
             self.values = newVals
-        "*** YOUR CODE HERE ***"
 
 
     def getValue(self, state):
@@ -89,11 +87,11 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        qVal = 0
-        for newState, probability in self.mdp.getTransitionStatesAndProbs(state, action):
-            reward = self.mdp.getReward(state, action, newState)
-            qVal += probability * (reward + self.discount * self.values[newState])
-        return qVal
+        Q = 0
+        for nextState, nextProbability in self.mdp.getTransitionStatesAndProbs(state, action):
+            reward = self.mdp.getReward(state, action, nextState) #R(s,a,s')
+            Q += nextProbability * (reward + self.discount * self.values[nextState])
+        return Q
 
     def computeActionFromValues(self, state):
         """
@@ -107,13 +105,12 @@ class ValueIterationAgent(ValueEstimationAgent):
         "*** YOUR CODE HERE ***"
         if self.mdp.isTerminal(state):
             return None
-        
         bestAction = None
-        bestValue = float('-inf')
+        bestVal = float('-inf')
         for action in self.mdp.getPossibleActions(state):
-            qVal = self.computeQValueFromValues(state, action)
-            if qVal > bestValue:
-                bestValue = qVal
+            Q = self.computeQValueFromValues(state, action)
+            if Q > bestVal:
+                bestVal = Q
                 bestAction = action
         return bestAction
 
@@ -122,7 +119,6 @@ class ValueIterationAgent(ValueEstimationAgent):
         return self.computeActionFromValues(state)
 
     def getAction(self, state):
-        "Returns the policy at the state (no exploration)."
         return self.computeActionFromValues(state)
 
     def getQValue(self, state, action):
